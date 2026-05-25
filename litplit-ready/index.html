@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LitPlit — Визуализатор декоративных чугунных люков</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/static/style.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="header-inner">
+      <a class="brand" href="https://litplit.ru" target="_blank" rel="noopener" aria-label="ЛитПлит">
+        <img class="brand-logo"
+             src="/static/brand/litplit-logo.png"
+             alt="ЛитПлит" height="50" loading="eager" decoding="async" />
+        <span class="brand-text">
+          <span class="brand-line-1">ЛИТПЛИТ <span class="brand-dash">—</span> ХУДОЖЕСТВЕННОЕ ЛИТЬЕ</span>
+          <span class="brand-line-2">Самый большой выбор люков</span>
+          <span class="brand-line-3"><span class="brand-domain">LITPLIT.RU</span> <span class="brand-sep">·</span> <span class="brand-phone">+7 966 848 04 04</span></span>
+        </span>
+      </a>
+      <div class="header-right">
+        <a class="header-link" href="https://litplit.ru/luki" target="_blank" rel="noopener">Каталог на сайте</a>
+        <div class="header-badge" id="headerBadge">49 дизайнов</div>
+      </div>
+    </div>
+  </header>
+
+  <main class="app-layout">
+    <!-- LEFT PANEL: Upload + Selected + Action -->
+    <aside class="panel panel-left">
+      <section class="upload-section">
+        <h2 class="section-label">01 — Загрузите фото</h2>
+        <div class="drop-zone" id="dropZone">
+          <div class="drop-zone-inner">
+            <div class="drop-icon">
+              <svg viewBox="0 0 48 48" fill="none">
+                <path d="M24 4L24 32M24 4L16 12M24 4L32 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                <rect x="6" y="36" width="36" height="8" rx="2" stroke="currentColor" stroke-width="1.5"/>
+              </svg>
+            </div>
+            <p class="drop-label">Перетащите фото сюда</p>
+            <p class="drop-sub">или <label for="fileInput" class="file-link">выберите файл</label></p>
+            <p class="drop-hint">JPG, PNG, WEBP — до 15 МБ</p>
+          </div>
+          <input type="file" id="fileInput" accept="image/*" hidden />
+        </div>
+        <div class="preview-photo" id="previewPhoto" style="display:none">
+          <img id="uploadedImg" alt="Загруженное фото" />
+          <button class="btn-remove" id="removePhoto" title="Удалить фото">✕</button>
+        </div>
+      </section>
+
+      <section class="selected-section" id="selectedSection">
+        <h2 class="section-label">02 — Выбранный люк</h2>
+        <div class="selected-preview" id="selectedPreview">
+          <div class="selected-placeholder">Выберите люк из каталога →</div>
+        </div>
+      </section>
+
+      <button class="btn-generate" id="generateBtn" disabled>
+        <span class="btn-text">Установить люк с ИИ</span>
+        <span class="btn-arrow">→</span>
+      </button>
+    </aside>
+
+    <!-- CENTER: Catalog -->
+    <section class="panel panel-catalog">
+      <div class="catalog-header">
+        <div class="catalog-header-top">
+          <h2 class="section-label">Каталог люков</h2>
+          <span class="catalog-count" id="catalogCount"></span>
+        </div>
+        <div class="catalog-search-wrap">
+          <input class="catalog-search" id="catalogSearch" type="text" placeholder="Поиск по названию…" autocomplete="off" />
+        </div>
+      </div>
+      <div class="catalog-grid" id="catalogGrid">
+        <div class="catalog-loading">
+          <div class="spinner"></div>
+          <span>Загрузка коллекции…</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- RIGHT PANEL: Result -->
+    <section class="panel panel-result" id="resultPanel">
+      <h2 class="section-label">03 — Результат</h2>
+      <div class="result-idle" id="resultIdle">
+        <div class="result-idle-icon">
+          <svg viewBox="0 0 64 64" fill="none">
+            <circle cx="32" cy="32" r="28" stroke="currentColor" stroke-width="1.5" stroke-dasharray="4 3"/>
+            <circle cx="32" cy="32" r="16" stroke="currentColor" stroke-width="1"/>
+            <circle cx="32" cy="32" r="6" fill="currentColor" opacity="0.3"/>
+          </svg>
+        </div>
+        <p>Загрузите фото своего участка, выберите люк из каталога и откройте редактор. Нажмите на фото в месте установки — ИИ впишет чугунный люк в сцену с учётом света, теней, снега или гравия.</p>
+      </div>
+      <div class="result-output" id="resultOutput" style="display:none">
+        <div class="compare-container">
+          <div class="compare-before">
+            <img id="beforeImg" alt="До" />
+            <span class="compare-tag">До</span>
+          </div>
+          <div class="compare-after">
+            <img id="afterImg" alt="После" />
+            <span class="compare-tag">После</span>
+          </div>
+        </div>
+        <div class="result-meta" id="resultMeta"></div>
+        <div class="result-actions">
+          <button class="btn-download" id="downloadBtn">↓ Скачать</button>
+          <button class="btn-share" id="shareBtn">
+            <svg viewBox="0 0 20 20" fill="none" width="14" height="14">
+              <circle cx="15" cy="4" r="2" stroke="currentColor" stroke-width="1.5"/>
+              <circle cx="15" cy="16" r="2" stroke="currentColor" stroke-width="1.5"/>
+              <circle cx="5" cy="10" r="2" stroke="currentColor" stroke-width="1.5"/>
+              <line x1="7" y1="9" x2="13" y2="5" stroke="currentColor" stroke-width="1.5"/>
+              <line x1="7" y1="11" x2="13" y2="15" stroke="currentColor" stroke-width="1.5"/>
+            </svg>
+            Поделиться
+          </button>
+          <button class="btn-try-again" id="tryAgainBtn">Изменить</button>
+        </div>
+      </div>
+
+      <!-- Share modal overlay -->
+      <div class="share-modal" id="shareModal" style="display:none">
+        <div class="share-modal-inner">
+          <div class="share-modal-header">
+            <span class="share-modal-title">Поделиться визуализацией</span>
+            <button class="share-modal-close" id="shareModalClose">✕</button>
+          </div>
+          <div class="share-loading" id="shareLoading">
+            <div class="spinner"></div>
+            <span>Создание ссылки…</span>
+          </div>
+          <div class="share-ready" id="shareReady" style="display:none">
+            <p class="share-desc">Поделитесь визуализацией с клиентом или архитектором:</p>
+            <div class="share-url-row">
+              <input class="share-url-input" id="shareUrlInput" type="text" readonly />
+              <button class="share-copy-btn" id="shareCopyBtn">Копировать</button>
+            </div>
+            <div class="share-channels">
+              <a class="share-channel share-channel-tg" id="shareTgBtn" href="#" target="_blank" rel="noopener">
+                <svg viewBox="0 0 24 24" fill="currentColor" width="15" height="15"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.447 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12L7.17 13.617l-2.96-.924c-.643-.204-.657-.643.136-.953l11.57-4.461c.537-.194 1.006.131.978.942z"/></svg>
+                Telegram
+              </a>
+              <a class="share-channel share-channel-email" id="shareEmailBtn" href="#" target="_blank" rel="noopener">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="15" height="15"><rect x="2" y="4" width="20" height="16" rx="2"/><polyline points="2,4 12,13 22,4"/></svg>
+                Email
+              </a>
+            </div>
+            <a class="share-open-link" id="shareOpenLink" target="_blank" rel="noopener">Открыть страницу →</a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Tap-to-place AI Inpainting Editor -->
+  <div class="editor-modal" id="editorModal" style="display:none">
+    <div class="editor-topbar">
+      <div class="editor-title">
+        <span class="editor-eyebrow">AI Установка люка</span>
+        <span class="editor-cover-name" id="editorCoverName">—</span>
+      </div>
+      <div class="editor-topbar-actions">
+        <button class="editor-btn editor-btn-ghost" id="cancelBtn">Отмена</button>
+        <button class="editor-btn editor-btn-gold" id="generateBtn2" disabled>Сгенерировать с ИИ →</button>
+      </div>
+    </div>
+    <div class="editor-stage" id="editorStage">
+      <div class="editor-photo-wrap" id="photoWrap">
+        <img id="basePhoto" alt="" draggable="false" />
+        <div class="tap-marker" id="tapMarker" style="display:none">
+          <img id="markerThumb" alt="" draggable="false" />
+        </div>
+        <div class="tap-hint" id="tapHint">Нажмите на фото в том месте, где должен стоять люк</div>
+      </div>
+      <div class="ai-overlay" id="aiOverlay" style="display:none">
+        <div class="ai-spinner"></div>
+        <div class="ai-status" id="aiStatus">ИИ устанавливает люк в сцену…</div>
+        <div class="ai-sub">Stable Diffusion · ~20–40 сек</div>
+      </div>
+    </div>
+    <div class="editor-controls">
+      <div class="editor-ctrl">
+        <label class="editor-ctrl-label">
+          <span>Размер люка</span>
+          <span id="radiusValue" class="ctrl-val">18%</span>
+        </label>
+        <input type="range" id="radiusSlider" min="6" max="40" value="18" class="slider editor-slider" />
+      </div>
+      <div class="editor-hint-mini" id="editorMainHint">Шаг 1 — нажмите на фото, чтобы выбрать место установки. Шаг 2 — ползунком подгоните размер. Шаг 3 — ИИ установит люк под лето/снег/гравий.</div>
+    </div>
+  </div>
+
+  <!-- Toast notification -->
+  <div class="toast" id="toast"></div>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>
